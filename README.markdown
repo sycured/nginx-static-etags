@@ -9,7 +9,7 @@ Download the module however you like.  I'd recommend pulling it down with Git by
 
     mkdir ~/src
     cd    ~/src
-    git clone git://github.com/mikewest/nginx-static-etags.git ./nginx-static-etags
+    git clone git clone git@github.com:kkung/nginx-static-etags.git ./nginx-static-stags
 
 To use the module, you'll have to compile it into Nginx.  So, download the Nginx source, configure it with the module path, and compile:
 
@@ -18,7 +18,7 @@ To use the module, you'll have to compile it into Nginx.  So, download the Nginx
     curl -O http://sysoev.ru/nginx/nginx-0.6.32.tar.gz
     tar -zxvf ./nginx-0.6.32.tar.gz
     cd ./nginx-0.6.32
-    ./configure --add-module=/Users/mikewest/Repositories/nginx-static-etags
+    ./configure --add-module=/~src/nginx-static-etags
     make
     sudo make install
     
