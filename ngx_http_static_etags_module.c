@@ -37,7 +37,6 @@
  */
 typedef struct {
     ngx_uint_t  FileETag;
-    ngx_str_t   etag_format;
 } ngx_http_static_etags_loc_conf_t;
 
 static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
@@ -54,13 +53,6 @@ static ngx_command_t  ngx_http_static_etags_commands[] = {
       ngx_conf_set_flag_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof( ngx_http_static_etags_loc_conf_t, FileETag ),
-      NULL },
-
-    { ngx_string( "etag_format" ),
-      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
-      ngx_conf_set_str_slot,
-      NGX_HTTP_LOC_CONF_OFFSET,
-      offsetof( ngx_http_static_etags_loc_conf_t, etag_format ),
       NULL },
 
       ngx_null_command
@@ -112,8 +104,7 @@ static char * ngx_http_static_etags_merge_loc_conf(ngx_conf_t *cf, void *parent,
     ngx_http_static_etags_loc_conf_t *conf = child;
 
     ngx_conf_merge_uint_value( conf->FileETag, prev->FileETag, 0 );
-    ngx_conf_merge_str_value(  conf->etag_format, prev->etag_format, "%s_%X_%X" );
-
+ 
     if ( conf->FileETag != 0 && conf->FileETag != 1 ) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
             "FileETag must be 'on' or 'off'");
