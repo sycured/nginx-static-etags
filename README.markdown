@@ -26,11 +26,13 @@ And you're done!
 
 ### Configuration
 
-Add `FileEtag` to the relevant `location` blocks in your `nginx.conf` file:
+Add `etags` to the relevant `location` blocks in your `nginx.conf` file:
 
     location / {
         ...
-        FileETag on;
+        etags on;
+        etag_hash on|off;
+        etag_hash_method md5|sha1;
         ...
     }
 
