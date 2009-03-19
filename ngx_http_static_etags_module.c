@@ -290,6 +290,48 @@ static ngx_int_t ngx_http_static_etags_header_filter(ngx_http_request_t *r) {
               r->headers_out.etag->value.len = str_buffer.len;
               r->headers_out.etag->value.data = str_buffer.data;
             }
+            
+            ngx_uint_t      found=0;
+            ngx_list_part_t *part;
+            ngx_table_elt_t *header;
+            ngx_table_elt_t if_none_match;
+
+            part = &r->headers_in.headers.part;
+            header = part->elts;
+
+            for ( i = 0 ; ; i++ ) {
+                    if ( i >= part->nelts) {
+                            if ( part->next == NULL ) {
+                                    break;
+                            }
+
+                            part = part->next;
+                            header = part->elts;
+                            i = 0;
+                    }
+
+                    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0 , "[Etag] Header %V: %V", &header[i].key, &header[i].value );
+
+                    if ( ngx_strcmp(header[i].key.data, "If-None-Match") == 0 ) {
+                            if_none_match = header[i];
+                            found = 1;
+                            break;
+                    }
+            }
+
+            if ( found ) {
+                    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                                    "[Etag] If-None-Match: \"%V\" // Hash: \"%V\"", &if_none_match.value, &r->headers_out.etag->value );
+
+                    if ( ngx_strncmp(r->headers_out.etag->value.data, if_none_match.value.data, r->headers_out.etag->value.len) == 0 ) {
+                            r->headers_out.status = NGX_HTTP_NOT_MODIFIED;
+                            r->headers_out.content_type.len = 0;
+
+                            ngx_http_clear_content_length(r);
+                            ngx_http_clear_accept_ranges(r);
+                    }
+            }
+            
         }
     }
 
