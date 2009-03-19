@@ -157,13 +157,13 @@ static ngx_int_t ngx_http_static_etags_init(ngx_conf_t *cf) {
 }
 
 static ngx_int_t ngx_http_static_etags_header_filter(ngx_http_request_t *r) {
-    int                                 status;
+//    int                                 status;
     ngx_log_t                          *log;
     u_char                             *p;
     size_t                              root;
     ngx_str_t                           path;
     ngx_http_static_etags_loc_conf_t   *loc_conf;
-    struct stat                         stat_result;
+//    struct stat                         stat_result;
     ngx_str_t                           str_buffer;
     ngx_str_t                           etag;
     
@@ -172,6 +172,10 @@ static ngx_int_t ngx_http_static_etags_header_filter(ngx_http_request_t *r) {
     
     u_char *hashed_etag;
     u_char *hash = NULL;
+    
+    // for nginx_open_file_cache
+    ngx_open_file_info_t       of;
+    ngx_http_core_loc_conf_t  *clcf;
     
     log = r->connection->log;
     
@@ -191,15 +195,25 @@ static ngx_int_t ngx_http_static_etags_header_filter(ngx_http_request_t *r) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
                         "[etag] http filename: \"%s\"", path.data);
     
-        status = stat( (char *) path.data, &stat_result );
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
-          "[etag] stat returned: \"%d\"", status);
-          
+
+        clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
+        of.test_dir = 0;
+        of.valid = clcf->open_file_cache_valid;
+        of.min_uses = clcf->open_file_cache_min_uses;
+        of.errors = clcf->open_file_cache_errors;
+        of.events = clcf->open_file_cache_events;
+        
+        
+        // status = stat( (char *) path.data, &stat_result );
+        //       ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
+        //         "[etag] stat returned: \"%d\"", status);
+        //         
         // Did the `stat` succeed?
-        if ( 0 == status) {
+      //  if ( 0 == status) {
+        if (ngx_open_cached_file(clcf->open_file_cache, &path, &of, r->pool) == NGX_OK ) {
             
             str_buffer.data = ngx_palloc(r->pool,
-              3 + r->uri.len + sizeof(stat_result.st_size) + sizeof(stat_result.st_mtime)  
+              3 + r->uri.len + sizeof(of.size) + sizeof(of.mtime)  
             );
             if ( str_buffer.data == NULL ) {
               ngx_log_debug(NGX_LOG_DEBUG_HTTP, log, 0,
@@ -207,13 +221,13 @@ static ngx_int_t ngx_http_static_etags_header_filter(ngx_http_request_t *r) {
               return NGX_ERROR;
             } 
             
-            str_buffer.len = ngx_sprintf(str_buffer.data, "%V_%T_%z",&r->uri,stat_result.st_mtime,stat_result.st_size) - str_buffer.data;
+            str_buffer.len = ngx_sprintf(str_buffer.data, "%V_%T_%z",&r->uri,of.mtime,of.size) - str_buffer.data;
            
     
             ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
-                         "[etag] st_size: '%d'", stat_result.st_size);
+                         "[etag] st_size: '%d'", of.size);
             ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
-                         "[etag] st_mtime: '%d'", stat_result.st_mtime);
+                         "[etag] st_mtime: '%d'", of.mtime);
             ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
                          "[etag] Concatted: '%V'", &str_buffer );
             
