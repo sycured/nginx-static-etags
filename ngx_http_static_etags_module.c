@@ -198,6 +198,7 @@ static ngx_int_t ngx_http_static_etags_header_filter(ngx_http_request_t *r) {
 
         clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
         of.test_dir = 0;
+        of.test_only = 1;
         of.valid = clcf->open_file_cache_valid;
         of.min_uses = clcf->open_file_cache_min_uses;
         of.errors = clcf->open_file_cache_errors;
