@@ -9,7 +9,7 @@ Download the module however you like.  I'd recommend pulling it down with Git by
 
     mkdir ~/src
     cd    ~/src
-    git clone git clone git@github.com:kkung/nginx-static-etags.git ./nginx-static-stags
+    git clone git@github.com:kkung/nginx-static-etags.git ./nginx-static-stags
 
 To use the module, you'll have to compile it into Nginx.  So, download the Nginx source, configure it with the module path, and compile:
 
