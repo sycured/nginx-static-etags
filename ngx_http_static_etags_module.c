@@ -12,24 +12,12 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 #include <sys/stat.h>
-
-#if (NGX_HAVE_OPENSSL_MD5_H)
 #include <openssl/md5.h>
-#else
-#include <md5.h>
-#endif
+#include <openssl/sha.h>
 
-#if (NGX_OPENSSL_MD5)
 #define  MD5Init    MD5_Init
 #define  MD5Update  MD5_Update
 #define  MD5Final   MD5_Final
-#endif
-
-#if (NGX_HAVE_OPENSSL_SHA1_H)
-#include <openssl/sha.h>
-#else
-#include <sha.h>
-#endif
 
 #define MD5_HEX_DIGEST_LENGTH MD5_DIGEST_LENGTH*2
 #define SHA_HEX_DIGEST_LENGTH SHA_DIGEST_LENGTH*2

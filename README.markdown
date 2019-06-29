@@ -1,30 +1,7 @@
 Nginx Static Etags
 ------------------
 
-Nginx doesn't generate etags for static content.  I think it should.  If I can remember enough C from college to make it work as a module, I will.
-
-### Installation
-
-Download the module however you like.  I'd recommend pulling it down with Git by simply cloning this repository:
-
-    mkdir ~/src
-    cd    ~/src
-    git clone https://github.com/kkung/nginx-static-etags.git ./nginx-static-stags
-
-To use the module, you'll have to compile it into Nginx.  So, download the Nginx source, configure it with the module path, and compile:
-
-    mkdir ~/src
-    cd ~/src
-    curl -O http://sysoev.ru/nginx/nginx-0.6.32.tar.gz
-    tar -zxvf ./nginx-0.6.32.tar.gz
-    cd ./nginx-0.6.32
-    ./configure --add-module=/~src/nginx-static-etags
-    make
-    sudo make install
-    
-And you're done!
-
-### Configuration
+## Configuration
 
 Add `etags` to the relevant `location` blocks in your `nginx.conf` file:
 
@@ -35,7 +12,3 @@ Add `etags` to the relevant `location` blocks in your `nginx.conf` file:
         etag_hash_method md5|sha1;
         ...
     }
-
-It's currently an on/off toggle.  The plan is to bring it to feature parity with [the Apache configuration option][apache].  It's really not there yet.
-
-[apache]: http://httpd.apache.org/docs/1.3/mod/core.html#fileetag
